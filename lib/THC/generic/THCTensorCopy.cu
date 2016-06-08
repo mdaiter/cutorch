@@ -97,7 +97,7 @@ THCTensor_(copy)(THCState* state, THCTensor* dst, THCTensor* src) {
       }
 
       bool succ =
-        THCudaTensor_pointwiseApply2(state, dst, src, CopyOp<float>());
+        cutorch_pointwiseApply2(state, dst, src, CopyOp<real>());
       THArgCheck(succ, 2, CUTORCH_DIM_WARNING);
 
       // Restore prior THCState stream
@@ -126,7 +126,7 @@ THCTensor_(copy)(THCState* state, THCTensor* dst, THCTensor* src) {
 
       THCudaCheck(cudaMemcpyAsync(THCudaTensor_data(state, dstContig),
                                   THCudaTensor_data(state, srcContig),
-                                  totalElements * sizeof(float),
+                                  totalElements * sizeof(real),
                                   cudaMemcpyDeviceToDevice,
                                   copyStream));
 
@@ -171,6 +171,20 @@ THCTensor_(copy)(THCState* state, THCTensor* dst, THCTensor* src) {
   if (errcode != cudaSuccess) {
     THError(cudaGetErrorString(errcode));
   }
+}
+
+THC_API void
+THCTensor_(copyIgnoringOverlaps)(THCState* state, THCTensor* dst, THCTensor* src) {
+  // Called when we are copying into an overlapping index `dst`, but
+  // we don't care which writer wins. Hacky but it works.
+  // This is itself invoked by pointwiseApply2 / THCTensor_copy in
+  // case that there are write overlaps.
+  // FIXME: really, overlapping writes should be illegal/an error in Torch
+  cutorch_pointwiseApply2(
+    state, dst, src,
+    CopyOp<typename TensorUtils<THCTensor>::DataType>(),
+    ReadOnly, /* ignore overwrites */
+    ReadOnly);
 }
 
 // conversions are mediated by the CPU

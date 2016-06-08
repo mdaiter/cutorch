@@ -124,9 +124,9 @@ SET(src-cuda
   THCTensorConv.cu
   THCTensorRandom.cu
   THCTensorScatterGather.cu
-  THCApply.cu
   THCTensorSort.cu
   THCTensorTopK.cu
+  THCTensorTypeUtils.cu
   )
 
 IF(CUDA_HAS_FP16 OR NOT ${CUDA_VERSION} LESS 7.5)
@@ -176,6 +176,8 @@ INSTALL(FILES
           THCDeviceTensorUtils-inl.cuh
           THCGenerateAllTypes.h
           THCHalf.h
+          THCTensorInfo.cuh
+          THCTensorTypeUtils.cuh
           DESTINATION "${THC_INSTALL_INCLUDE_SUBDIR}/THC")
 
 INSTALL(FILES
@@ -191,4 +193,6 @@ INSTALL(FILES
           generic/THCTensorCopy.c
           generic/THCTensorCopy.cu
           generic/THCTensorCopy.h
+          generic/THCTensorFill.h
+          generic/THCTensorFill.cu
           DESTINATION "${THC_INSTALL_INCLUDE_SUBDIR}/THC/generic")

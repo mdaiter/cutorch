@@ -3,6 +3,7 @@
 #else
 
 THC_API void THCTensor_(copy)(THCState *state, THCTensor *self, THCTensor *src);
+THC_API void THCTensor_(copyIgnoringOverlaps)(THCState *state, THCTensor *self, THCTensor *src);
 THC_API void THCTensor_(copyByte)(THCState *state, THCTensor *self, THByteTensor *src);
 THC_API void THCTensor_(copyChar)(THCState *state, THCTensor *self, THCharTensor *src);
 THC_API void THCTensor_(copyShort)(THCState *state, THCTensor *self, THShortTensor *src);

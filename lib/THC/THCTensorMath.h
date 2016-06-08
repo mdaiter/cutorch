@@ -4,8 +4,8 @@
 #include "THCTensor.h"
 #include "THCGeneral.h"
 
-THC_API void THCudaTensor_fill(THCState *state, THCudaTensor *self, float value);
-THC_API void THCudaTensor_zero(THCState *state, THCudaTensor *self);
+#include "generic/THCTensorFill.h"
+#include "THCGenerateAllTypes.h"
 
 THC_API void THCudaTensor_zeros(THCState *state, THCudaTensor *r_, THLongStorage *size);
 THC_API void THCudaTensor_ones(THCState *state, THCudaTensor *r_, THLongStorage *size);

@@ -13,6 +13,7 @@ THCCudaResourcesPerDevice* THCState_getDeviceResourcePtr(
 
 void THCudaInit(THCState* state)
 {
+  printf("HERE!!!!!!!!!!!!\n");
   state->cutorchGCFunction = NULL;
   state->cutorchGCData = NULL;
 

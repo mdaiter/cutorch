@@ -19,13 +19,13 @@
   void THCudaTensor_##NAME(THCState* state, THCudaTensor* self_, THCudaTensor* src) { \
     THAssert(THCudaTensor_checkGPU(state, 2, self_, src));                \
     if (self_ == src) {                                                 \
-      if (!THCudaTensor_pointwiseApply1(state, self_, Tensor##NAME##Op())) { \
+      if (!cutorch_pointwiseApply1(state, self_, Tensor##NAME##Op())) { \
         THArgCheck(false, 2, CUTORCH_DIM_WARNING); \
       }                                                                 \
     } else {                                                            \
       THCudaTensor_resizeAs(state, self_, src);                         \
                                                                         \
-      if (!THCudaTensor_pointwiseApply2(state, self_, src, Tensor##NAME##Op())) { \
+      if (!cutorch_pointwiseApply2(state, self_, src, Tensor##NAME##Op())) { \
         THArgCheck(false, 2, CUTORCH_DIM_WARNING); \
       }                                                                 \
     }                                                                   \
@@ -76,13 +76,13 @@ struct TensorSigmoidOp {
 void THCudaTensor_sigmoid(THCState* state, THCudaTensor* self_, THCudaTensor* src) {
   THAssert(THCudaTensor_checkGPU(state, 2, self_, src));
   if (self_ == src) {
-    if (!THCudaTensor_pointwiseApply1(state, self_, TensorSigmoidOp())) {
+    if (!cutorch_pointwiseApply1(state, self_, TensorSigmoidOp())) {
       THArgCheck(false, 2, CUTORCH_DIM_WARNING);
     }
   } else {
     THCudaTensor_resizeAs(state, self_, src);
 
-    if (!THCudaTensor_pointwiseApply2(state, self_, src, TensorSigmoidOp())) {
+    if (!cutorch_pointwiseApply2(state, self_, src, TensorSigmoidOp())) {
       THArgCheck(false, 2, CUTORCH_DIM_WARNING);
     }
   }
@@ -123,12 +123,12 @@ void THCudaTensor_cadd(THCState *state, THCudaTensor *self_, THCudaTensor* src1,
   if (self_ == src1) {
     if (value == 1.0f) {
       // self += src2
-      if (!THCudaTensor_pointwiseApply2(state, self_, src2, TensorAddOp())) {
+      if (!cutorch_pointwiseApply2(state, self_, src2, TensorAddOp())) {
         THArgCheck(false, 2, CUTORCH_DIM_WARNING);
       }
     } else {
       // self += value * src2
-      if (!THCudaTensor_pointwiseApply2(state, self_, src2, TensorCAddOp(value))) {
+      if (!cutorch_pointwiseApply2(state, self_, src2, TensorCAddOp(value))) {
         THArgCheck(false, 2, CUTORCH_DIM_WARNING);
       }
     }
@@ -137,12 +137,12 @@ void THCudaTensor_cadd(THCState *state, THCudaTensor *self_, THCudaTensor* src1,
 
     if (value == 1.0f) {
       // self = src1 + src2
-      if (!THCudaTensor_pointwiseApply3(state, self_, src1, src2, TensorAddOp())) {
+      if (!cutorch_pointwiseApply3(state, self_, src1, src2, TensorAddOp())) {
         THArgCheck(false, 2, CUTORCH_DIM_WARNING);
       }
     } else {
       // self = src1 + value * src2
-      if (!THCudaTensor_pointwiseApply3(state, self_, src1, src2, TensorCAddOp(value))) {
+      if (!cutorch_pointwiseApply3(state, self_, src1, src2, TensorCAddOp(value))) {
         THArgCheck(false, 2, CUTORCH_DIM_WARNING);
       }
     }
@@ -186,12 +186,12 @@ void THCudaTensor_csub(THCState *state, THCudaTensor *self_, THCudaTensor* src1,
   if (self_ == src1) {
     if (value == 1.0f) {
       // self -= src2
-      if (!THCudaTensor_pointwiseApply2(state, self_, src2, TensorSubOp())) {
+      if (!cutorch_pointwiseApply2(state, self_, src2, TensorSubOp())) {
         THArgCheck(false, 2, CUTORCH_DIM_WARNING);
       }
     } else {
       // self += -value * src2
-      if (!THCudaTensor_pointwiseApply2(state, self_, src2, TensorCAddOp(-value))) {
+      if (!cutorch_pointwiseApply2(state, self_, src2, TensorCAddOp(-value))) {
         THArgCheck(false, 2, CUTORCH_DIM_WARNING);
       }
     }
@@ -200,12 +200,12 @@ void THCudaTensor_csub(THCState *state, THCudaTensor *self_, THCudaTensor* src1,
 
     if (value == 1.0f) {
       // self = src1 - src2
-      if (!THCudaTensor_pointwiseApply3(state, self_, src1, src2, TensorSubOp())) {
+      if (!cutorch_pointwiseApply3(state, self_, src1, src2, TensorSubOp())) {
         THArgCheck(false, 2, CUTORCH_DIM_WARNING);
       }
     } else {
       // self = src1 - value * src2
-      if (!THCudaTensor_pointwiseApply3(state, self_, src1, src2, TensorCAddOp(-value))) {
+      if (!cutorch_pointwiseApply3(state, self_, src1, src2, TensorCAddOp(-value))) {
         THArgCheck(false, 2, CUTORCH_DIM_WARNING);
       }
     }
@@ -233,14 +233,14 @@ void THCudaTensor_cmul(THCState *state, THCudaTensor *self_, THCudaTensor *src1,
 
   if (self_ == src1) {
     // self *= src2
-    if (!THCudaTensor_pointwiseApply2(state, self_, src2, TensorMulOp())) {
+    if (!cutorch_pointwiseApply2(state, self_, src2, TensorMulOp())) {
       THArgCheck(false, 2, CUTORCH_DIM_WARNING);
     }
   } else {
     THCudaTensor_resizeAs(state, self_, src1);
 
     // self = src1 * src2
-    if (!THCudaTensor_pointwiseApply3(state, self_, src1, src2, TensorMulOp())) {
+    if (!cutorch_pointwiseApply3(state, self_, src1, src2, TensorMulOp())) {
       THArgCheck(false, 2, CUTORCH_DIM_WARNING);
     }
   }
@@ -265,12 +265,12 @@ void THCudaTensor_cmax(THCState *state, THCudaTensor *self, THCudaTensor *src1, 
              THCudaTensor_nElement(state, src2), 2, "sizes do not match");
 
   if (self == src1) {
-    if (!THCudaTensor_pointwiseApply2(state, self, src2, TensorMaxOp())) {
+    if (!cutorch_pointwiseApply2(state, self, src2, TensorMaxOp())) {
       THArgCheck(false, 2, CUTORCH_DIM_WARNING);
     }
   } else {
     THCudaTensor_resizeAs(state, self, src1);
-    if (!THCudaTensor_pointwiseApply3(state, self, src1, src2, TensorMaxOp())) {
+    if (!cutorch_pointwiseApply3(state, self, src1, src2, TensorMaxOp())) {
       THArgCheck(false, 2, CUTORCH_DIM_WARNING);
     }
   }
@@ -293,12 +293,12 @@ void THCudaTensor_cmin(THCState *state, THCudaTensor *self, THCudaTensor *src1, 
              THCudaTensor_nElement(state, src2), 2, "sizes do not match");
 
   if (self == src1) {
-    if (!THCudaTensor_pointwiseApply2(state, self, src2, TensorMinOp())) {
+    if (!cutorch_pointwiseApply2(state, self, src2, TensorMinOp())) {
       THArgCheck(false, 2, CUTORCH_DIM_WARNING);
     }
   } else {
     THCudaTensor_resizeAs(state, self, src1);
-    if (!THCudaTensor_pointwiseApply3(state, self, src1, src2, TensorMinOp())) {
+    if (!cutorch_pointwiseApply3(state, self, src1, src2, TensorMinOp())) {
       THArgCheck(false, 2, CUTORCH_DIM_WARNING);
     }
   }
@@ -323,12 +323,12 @@ void THCudaTensor_cmaxValue(THCState *state, THCudaTensor *self, THCudaTensor *s
   THAssert(THCudaTensor_checkGPU(state, 2, self, src));
 
   if (self == src) {
-    if (!THCudaTensor_pointwiseApply1(state, self, TensorMaxValueOp(value))) {
+    if (!cutorch_pointwiseApply1(state, self, TensorMaxValueOp(value))) {
       THArgCheck(false, 2, CUTORCH_DIM_WARNING);
     }
   } else {
     THCudaTensor_resizeAs(state, self, src);
-    if (!THCudaTensor_pointwiseApply2(state, self, src, TensorMaxValueOp(value))) {
+    if (!cutorch_pointwiseApply2(state, self, src, TensorMaxValueOp(value))) {
       THArgCheck(false, 2, CUTORCH_DIM_WARNING);
     }
   }
@@ -353,12 +353,12 @@ void THCudaTensor_cminValue(THCState *state, THCudaTensor *self, THCudaTensor *s
   THAssert(THCudaTensor_checkGPU(state, 2, self, src));
 
   if (self == src) {
-    if (!THCudaTensor_pointwiseApply1(state, self, TensorMinValueOp(value))) {
+    if (!cutorch_pointwiseApply1(state, self, TensorMinValueOp(value))) {
       THArgCheck(false, 2, CUTORCH_DIM_WARNING);
     }
   } else {
     THCudaTensor_resizeAs(state, self, src);
-    if (!THCudaTensor_pointwiseApply2(state, self, src, TensorMinValueOp(value))) {
+    if (!cutorch_pointwiseApply2(state, self, src, TensorMinValueOp(value))) {
       THArgCheck(false, 2, CUTORCH_DIM_WARNING);
     }
   }
