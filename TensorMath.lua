@@ -29,13 +29,13 @@ local unpack = unpack or table.unpack
 
 -- specific to CUDA
 local typenames = {'CudaByteTensor',
-                   'CudaCharTensor',
-                   'CudaShortTensor',
-                   'CudaIntTensor',
-                   'CudaLongTensor',
-                   'CudaTensor',
-                   'CudaDoubleTensor',
-                   'CudaHalfTensor'
+               'CudaCharTensor',
+               'CudaShortTensor',
+               'CudaIntTensor',
+               'CudaLongTensor',
+               'CudaTensor',
+               'CudaDoubleTensor',
+               'CudaHalfTensor'
 }
 
 for _, typename in ipairs(typenames) do
@@ -762,6 +762,19 @@ for k, Tensor in pairs(handledTypenames) do
             {name=Tensor},
             {name=real, creturned=true}})
 
+    wrap("scatter",
+         cname("scatter"),
+         {{name=Tensor, returned=true},
+             {name="index"},
+             {name='CudaLongTensor'},
+             {name=Tensor}},
+         cname("scatterFill"),
+         {{name=Tensor, returned=true},
+             {name="index"},
+             {name='CudaLongTensor'},
+             {name=real}})
+
+
     method:register("m_cutorch_" .. Tensor .. "Math__")
     interface:print(method:tostring())
     method:clearhistory()
@@ -940,24 +953,30 @@ wrap("gather",
                      arg.__metatable.init(arg),
                      string.format("TH%s_checkGPU(cutorch_getstate(L), 1, %s);",
                                    Tensor, arg.args[4]:carg()),
-                     string.format("TH%s_resizeAs(cutorch_getstate(L), %s, %s);", Tensor, arg:carg(), arg.args[4]:carg()),
+                     string.format(
+                         [[
+                             THCState *state = cutorch_getstate(L);
+                             THLongStorage *indicesSize = THCudaLongTensor_newSizeOf(state, %s);
+                             TH%s_resize(state, %s, indicesSize, NULL);
+                             THLongStorage_free(indicesSize);
+                         ]], arg.args[4]:carg(), Tensor, arg:carg()),
                   }, '\n')
             end
       },
       {name=Tensor},
       {name="index"},
-      {name=Tensor}})
+      {name='CudaLongTensor'}})
 
 wrap("scatter",
      cname("scatter"),
      {{name=Tensor, returned=true},
       {name="index"},
-      {name=Tensor},
+      {name='CudaLongTensor'},
       {name=Tensor}},
      cname("scatterFill"),
      {{name=Tensor, returned=true},
       {name="index"},
-      {name=Tensor},
+      {name='CudaLongTensor'},
       {name=real}})
 
 wrap("sort",
